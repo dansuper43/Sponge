@@ -42,6 +42,7 @@ public abstract class MixinWorld implements org.spongepowered.api.world.World {
     @Shadow public WorldInfo worldInfo;
     private long weatherStartTime;
 
+
     @Inject(method = "updateWeatherBody()V", remap = false, at = {
             @At(value = "INVOKE", target = "Lnet/minecraft/world/storage/WorldInfo;setThundering(Z)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/world/storage/WorldInfo;setRaining(Z)V")
@@ -76,5 +77,4 @@ public abstract class MixinWorld implements org.spongepowered.api.world.World {
         net.minecraftforge.common.util.BlockSnapshot block = (net.minecraftforge.common.util.BlockSnapshot) snapshot;
         ((World) (Object) this).setBlockState(new BlockPos(x, y, z), block.getReplacedBlock(), block.flag);
     }
-
 }
