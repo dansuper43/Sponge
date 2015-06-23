@@ -30,6 +30,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.ChunkProviderGenerate;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent;
@@ -39,8 +40,8 @@ import org.spongepowered.api.world.gen.BiomeGenerator;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.common.Sponge;
-import org.spongepowered.common.interfaces.IFlaggedPopulator;
 import org.spongepowered.common.interfaces.IMixinWorld;
+import org.spongepowered.common.interfaces.gen.IFlaggedPopulator;
 import org.spongepowered.common.world.gen.CustomChunkProviderGenerate;
 
 import java.util.List;
@@ -62,28 +63,33 @@ public final class CustomChunkProviderGenerateForge extends CustomChunkProviderG
         BlockFalling.fallInstantly = true;
 
         BlockPos blockpos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
-        BiomeGenBase biomegenbase = this.world.getBiomeGenForCoords(blockpos.add(16, 0, 16));
+        BiomeType biome = (BiomeType) this.world.getBiomeGenForCoords(blockpos.add(16, 0, 16));
+        
+        IMixinWorld iworld = (IMixinWorld) this.world;
 
         // Calling the events makes the Sponge-added populators fire
         org.spongepowered.api.world.Chunk chunk = (org.spongepowered.api.world.Chunk) this.world.getChunkFromChunkCoords(chunkX, chunkZ);
-        List<Populator> populators = ((IMixinWorld) this.world).getPopulators();
+        List<Populator> populators = iworld.getPopulators();
+        if(iworld.getBiomeOverrides().containsKey(biome)) {
+        	populators.addAll(iworld.getBiomeOverrides().get(biome).getPopulators());
+        } else {
+        	populators.addAll(biome.getGenerationSettings().getPopulators());
+        }
         Sponge.getGame().getEventManager().post(SpongeEventFactory.createChunkPrePopulate(Sponge.getGame(), chunk, populators));
 
+        MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Pre(this.world, random, blockpos));
+        MinecraftForge.ORE_GEN_BUS.post(new OreGenEvent.Pre(this.world, random, blockpos));
+        
         List<String> flags = Lists.newArrayList();
-        for (Populator populator : ((IMixinWorld) this.world).getPopulators()) {
+        for (Populator populator : populators) {
             if (populator instanceof IFlaggedPopulator) {
                 ((IFlaggedPopulator) populator).populate(chunkProvider, chunk, random, flags);
             } else {
                 populator.populate(chunk, random);
             }
         }
-        for (Populator populator : ((BiomeType) biomegenbase).getPopulators()) {
-            populator.populate(chunk, random);
-        }
 
         // throw the forge decorate and ore gen events
-        MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Pre(this.world, random, blockpos));
-        MinecraftForge.ORE_GEN_BUS.post(new OreGenEvent.Pre(this.world, random, blockpos));
         MinecraftForge.ORE_GEN_BUS.post(new OreGenEvent.Post(this.world, random, blockpos));
         MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Post(this.world, random, blockpos));
 
