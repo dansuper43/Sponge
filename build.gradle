@@ -1,5 +1,3 @@
-import org.apache.tools.ant.filters.*
-
 buildscript {
     repositories {
         mavenCentral()
@@ -41,7 +39,7 @@ dependencies {
 
 compileJava {
     options.compilerArgs += [
-            "-Atokens=FORGE=${forgeBuild};FML=${forgeBuild}"
+            "-Atokens=FORGE=$forgeBuild;FML=$forgeBuild"
     ]
 }
 
@@ -51,11 +49,11 @@ jar {
     manifest {
         attributes(
                 'Main-Class': 'org.spongepowered.launch.Main',
-                'TargetForgeBuild': "${forgeBuild}",
-                'TargetForgeVersion': "${forgeVersion}",
+                'TargetForgeBuild': forgeBuild,
+                'TargetForgeVersion': forgeVersion,
                 'FMLCorePlugin': 'org.spongepowered.mod.SpongeCoremod',
                 'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-                'TweakOrder': '0'
+                'TweakOrder': 0
         )
     }
 }
@@ -63,7 +61,7 @@ jar {
 processResources {
     from('src/main/resources') {
         include 'mcmod.info'
-        filter(ReplaceTokens, tokens: [
+        filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [
             'VERSION' : project.version.toString(),
             'URL': project.url.toString(),
             'MCVERSION': minecraft.version.toString()
@@ -79,7 +77,7 @@ shadowJar {
         include(dependency('org.apache.ivy:ivy'))
     }
     
-    // Exlcude a bunch of stuff we don't need from Ivy, so the end jar is smaller
+    // Exclude a bunch of stuff we don't need from Ivy, so the end jar is smaller
     exclude 'fr/**'
     exclude 'org/apache/ivy/ant/**'
     exclude 'org/apache/ivy/logo.png'
