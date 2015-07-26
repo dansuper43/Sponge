@@ -28,7 +28,6 @@ import com.google.common.collect.Lists;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.ChunkProviderGenerate;
 import net.minecraftforge.common.MinecraftForge;
@@ -40,9 +39,8 @@ import org.spongepowered.api.world.gen.BiomeGenerator;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.common.Sponge;
-import org.spongepowered.common.interfaces.IMixinWorld;
 import org.spongepowered.common.interfaces.gen.IFlaggedPopulator;
-import org.spongepowered.common.world.gen.CustomChunkProviderGenerate;
+import org.spongepowered.common.world.gen.SpongeChunkProvider;
 
 import java.util.List;
 import java.util.Random;
@@ -51,7 +49,7 @@ import java.util.Random;
  * Similar class to {@link ChunkProviderGenerate}, but instead gets its blocks
  * from a custom chunk generator.
  */
-public final class CustomChunkProviderGenerateForge extends CustomChunkProviderGenerate {
+public final class CustomChunkProviderGenerateForge extends SpongeChunkProvider {
 
     public CustomChunkProviderGenerateForge(World world, GeneratorPopulator generatorPopulator, BiomeGenerator biomeGenerator) {
         super(world, generatorPopulator, biomeGenerator);
@@ -64,22 +62,21 @@ public final class CustomChunkProviderGenerateForge extends CustomChunkProviderG
 
         BlockPos blockpos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
         BiomeType biome = (BiomeType) this.world.getBiomeGenForCoords(blockpos.add(16, 0, 16));
-        
-        IMixinWorld iworld = (IMixinWorld) this.world;
 
         // Calling the events makes the Sponge-added populators fire
         org.spongepowered.api.world.Chunk chunk = (org.spongepowered.api.world.Chunk) this.world.getChunkFromChunkCoords(chunkX, chunkZ);
-        List<Populator> populators = iworld.getPopulators();
-        if(iworld.getBiomeOverrides().containsKey(biome)) {
-        	populators.addAll(iworld.getBiomeOverrides().get(biome).getPopulators());
+        
+        List<Populator> populators = Lists.newArrayList(this.pop);
+        if (this.overrides.containsKey(biome)) {
+            populators.addAll(this.overrides.get(biome).getPopulators());
         } else {
-        	populators.addAll(biome.getGenerationSettings().getPopulators());
+            populators.addAll(biome.getGenerationSettings().getPopulators());
         }
         Sponge.getGame().getEventManager().post(SpongeEventFactory.createChunkPrePopulate(Sponge.getGame(), chunk, populators));
 
         MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Pre(this.world, random, blockpos));
         MinecraftForge.ORE_GEN_BUS.post(new OreGenEvent.Pre(this.world, random, blockpos));
-        
+
         List<String> flags = Lists.newArrayList();
         for (Populator populator : populators) {
             if (populator instanceof IFlaggedPopulator) {
@@ -88,8 +85,7 @@ public final class CustomChunkProviderGenerateForge extends CustomChunkProviderG
                 populator.populate(chunk, random);
             }
         }
-
-        // throw the forge decorate and ore gen events
+        
         MinecraftForge.ORE_GEN_BUS.post(new OreGenEvent.Post(this.world, random, blockpos));
         MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Post(this.world, random, blockpos));
 
