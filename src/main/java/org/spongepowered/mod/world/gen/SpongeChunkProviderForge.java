@@ -49,9 +49,9 @@ import java.util.Random;
  * Similar class to {@link ChunkProviderGenerate}, but instead gets its blocks
  * from a custom chunk generator.
  */
-public final class CustomChunkProviderGenerateForge extends SpongeChunkProvider {
+public final class SpongeChunkProviderForge extends SpongeChunkProvider {
 
-    public CustomChunkProviderGenerateForge(World world, GeneratorPopulator generatorPopulator, BiomeGenerator biomeGenerator) {
+    public SpongeChunkProviderForge(World world, GeneratorPopulator generatorPopulator, BiomeGenerator biomeGenerator) {
         super(world, generatorPopulator, biomeGenerator);
     }
 
