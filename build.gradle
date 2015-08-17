@@ -1,19 +1,11 @@
 buildscript {
     repositories {
-        mavenCentral()
         jcenter()
-        maven {
-            name = 'forge'
-            url = 'http://files.minecraftforge.net/maven'
-        }
-        maven {
-            name = 'sonatype-snapshots'
-            url = 'https://oss.sonatype.org/content/repositories/snapshots'
-        }
+        mavenLocal()
     }
 
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.0-SNAPSHOT'
         classpath('nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0') {
             exclude module: 'guava'
         }
@@ -21,15 +13,18 @@ buildscript {
     }
 }
 
-apply plugin: 'forge'
+apply plugin: 'net.minecraftforge.gradle.forge'
 
 ext {
-    minecraftPlugin = plugins.getPlugin('forge')
-
+    minecraftPlugin = plugins.getPlugin('net.minecraftforge.gradle.forge')
     forgeBuild = '1499'
-    forgeVersion = "11.14.3.$forgeBuild"
 }
 
+minecraft {
+    forgeVersion = project.forgeBuild
+}
+
+net.minecraftforge.gradle.util.delayed.TokenReplacer.putReplacement('SRG_DIR', "$net.minecraftforge.gradle.common.Constants.DIR_MCP_MAPPINGS/srgs")
 apply from: project(':SpongeCommon').file('gradle/implementation.gradle')
 
 // Project dependencies
@@ -50,7 +45,7 @@ jar {
         attributes(
                 'Main-Class': 'org.spongepowered.launch.Main',
                 'TargetForgeBuild': forgeBuild,
-                'TargetForgeVersion': forgeVersion,
+                'TargetForgeVersion': minecraft.forgeVersion,
                 'FMLCorePlugin': 'org.spongepowered.mod.SpongeCoremod',
                 'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
                 'TweakOrder': 0
