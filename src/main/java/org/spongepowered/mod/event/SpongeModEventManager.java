@@ -163,7 +163,7 @@ public class SpongeModEventManager extends SpongeEventManager {
             if (listener instanceof EventPriority) {
                 Order order = this.priorityMappings.get(listener);
 
-                for (int orderIndex = 0; orderIndex <= order.ordinal(); orderIndex++) {
+                for (int orderIndex = orderStart.ordinal(); orderIndex <= order.ordinal(); orderIndex++) {
                     Order currentOrder = Order.values()[orderIndex];
                     post(event, handlerCache.getHandlersByOrder(currentOrder));
                 }
