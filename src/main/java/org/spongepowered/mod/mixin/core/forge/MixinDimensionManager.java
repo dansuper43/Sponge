@@ -24,16 +24,20 @@
  */
 package org.spongepowered.mod.mixin.core.forge;
 
+import com.google.common.base.Optional;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.world.GeneratorTypes;
+import org.spongepowered.api.world.WorldBuilder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.Sponge;
 import org.spongepowered.common.registry.SpongeGameRegistry;
 import org.spongepowered.common.world.SpongeDimensionType;
+import org.spongepowered.common.world.SpongeWorldBuilder;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -88,4 +92,32 @@ public abstract class MixinDimensionManager {
             unloadQueue.add(id);
         }
     }
+
+    @Overwrite
+    public static void initDimension(int dim) {
+        if (dim == 0) {
+            return;
+        }
+
+        int providerId = 0;
+        WorldServer overworld = DimensionManager.getWorld(0);
+        if (overworld == null) {
+            throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
+        }
+        try {
+            providerId = DimensionManager.getProviderType(dim);
+        } catch (Exception e) {
+            System.err.println("Cannot Hotload Dim: " + e.getMessage());
+            return; // If a provider hasn't been registered then we can't hotload the dim
+        }
+        WorldBuilder builder = Sponge.getSpongeRegistry().createWorldBuilder();
+        builder = builder.dimensionType(Sponge.getSpongeRegistry().getDimensionTypeFromProvider(providerId))
+                .keepsSpawnLoaded(spawnSettings.get(providerId)).generator(GeneratorTypes.DEFAULT); 
+        Optional<org.spongepowered.api.world.World> world = ((SpongeWorldBuilder) builder).dimensionId(dim).build();
+        // load world
+        if (world.isPresent()) {
+            Sponge.getGame().getServer().loadWorld(world.get().getProperties());
+        }
+    }
+
 }
