@@ -24,7 +24,7 @@
  */
 package org.spongepowered.mod.mixin.core.forge;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;

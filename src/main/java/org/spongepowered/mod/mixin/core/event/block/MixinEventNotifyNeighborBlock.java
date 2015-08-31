@@ -24,8 +24,6 @@
  */
 package org.spongepowered.mod.mixin.core.event.block;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
@@ -49,6 +47,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Predicate;
 
 @NonnullByDefault
 @Mixin(value = BlockEvent.NeighborNotifyEvent.class, remap = false)
@@ -76,7 +75,7 @@ public abstract class MixinEventNotifyNeighborBlock extends MixinEventBlock impl
     @Override
     public void filterDirections(Predicate<Direction> predicate) {
         Iterator<Direction> iterator = this.relatives.keySet().iterator();
-        if (!predicate.apply(iterator.next())) {
+        if (!predicate.test(iterator.next())) {
             iterator.remove();
         }
     }
@@ -91,7 +90,7 @@ public abstract class MixinEventNotifyNeighborBlock extends MixinEventBlock impl
                 this.relatives.put(direction, location);
             }
         }
-        ImmutableMap.Builder<Direction, BlockSnapshot> builder = new ImmutableMap.Builder<Direction, BlockSnapshot>(); 
+        ImmutableMap.Builder<Direction, BlockSnapshot> builder = new ImmutableMap.Builder<Direction, BlockSnapshot>();
         for (Map.Entry<Direction, Location<World>> mapEntry : this.relatives.entrySet()) {
             BlockSnapshot blockSnapshot = mapEntry.getValue().createSnapshot();
             builder.put(mapEntry.getKey(), blockSnapshot);

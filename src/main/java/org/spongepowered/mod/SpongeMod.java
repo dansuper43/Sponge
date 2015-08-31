@@ -24,7 +24,6 @@
  */
 package org.spongepowered.mod;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -61,7 +60,6 @@ import org.spongepowered.api.service.persistence.SerializationService;
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.service.world.ChunkLoadService;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.command.CommandMapping;
 import org.spongepowered.common.Sponge;
 import org.spongepowered.common.SpongeBootstrap;
 import org.spongepowered.common.command.MinecraftCommandWrapper;
@@ -162,14 +160,8 @@ public class SpongeMod extends DummyModContainer implements PluginContainer {
 
             MinecraftForge.EVENT_BUS.register(new SpongeEventHooks());
 
-            this.game.getServiceManager().potentiallyProvide(PermissionService.class).executeWhenPresent(new Predicate<PermissionService>() {
-
-                @Override
-                public boolean apply(PermissionService input) {
-                    input.registerContextCalculator(new SpongeContextCalculator());
-                    return true;
-                }
-            });
+            this.game.getServiceManager().potentiallyProvide(PermissionService.class)
+                    .executeWhenPresent(input -> input.registerContextCalculator(new SpongeContextCalculator()));
 
             // Add the SyncScheduler as a listener for ServerTickEvents
             FMLCommonHandler.instance().bus().register(this);
@@ -246,11 +238,9 @@ public class SpongeMod extends DummyModContainer implements PluginContainer {
     public void onServerStopped(FMLServerStoppedEvent event) throws IOException {
         try {
             CommandService service = getGame().getCommandDispatcher();
-            for (CommandMapping mapping : service.getCommands()) {
-                if (mapping.getCallable() instanceof MinecraftCommandWrapper) {
-                    service.removeMapping(mapping);
-                }
-            }
+            service.getCommands().stream()
+                    .filter(mapping -> mapping.getCallable() instanceof MinecraftCommandWrapper)
+                    .forEach(service::removeMapping);
             ((SqlServiceImpl) getGame().getServiceManager().provideUnchecked(SqlService.class)).close();
         } catch (Throwable t) {
             this.controller.errorOccurred(this, t);

@@ -26,7 +26,6 @@ package org.spongepowered.mod.registry;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
 import net.minecraftforge.fml.common.registry.GameData;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameDictionary;
@@ -57,37 +56,29 @@ public class SpongeModGameRegistry extends SpongeGameRegistry {
         setItemTypes();
     }
 
-    public com.google.common.base.Optional<BlockType> getBlock(String id) {
+    public java.util.Optional<BlockType> getBlock(String id) {
         if (!id.contains(":")) {
             id = "minecraft:" + id; // assume vanilla
         }
-        return com.google.common.base.Optional.fromNullable((BlockType) GameData.getBlockRegistry().getObject(id));
+        return java.util.Optional.ofNullable((BlockType) GameData.getBlockRegistry().getObject(id));
     }
 
-    public com.google.common.base.Optional<ItemType> getItem(String id) {
+    public java.util.Optional<ItemType> getItem(String id) {
         if (!id.contains(":")) {
             id = "minecraft:" + id; // assume vanilla
         }
-        return com.google.common.base.Optional.fromNullable((ItemType) GameData.getItemRegistry().getObject(id));
+        return java.util.Optional.ofNullable((ItemType) GameData.getItemRegistry().getObject(id));
     }
 
     private void setBlockTypes() {
-        RegistryHelper.mapFields(BlockTypes.class, new Function<String, BlockType>() {
-
-            @Override
-            public BlockType apply(String fieldName) {
-                return getBlock(fieldName.toLowerCase()).get();
-            }
+        RegistryHelper.mapFields(BlockTypes.class, fieldName -> {
+            return getBlock(fieldName.toLowerCase()).get();
         });
     }
 
     private void setItemTypes() {
-        RegistryHelper.mapFields(ItemTypes.class, new Function<String, ItemType>() {
-
-            @Override
-            public ItemType apply(String fieldName) {
-                return getItem(fieldName.toLowerCase()).get();
-            }
+        RegistryHelper.mapFields(ItemTypes.class, fieldName -> {
+            return getItem(fieldName.toLowerCase()).get();
         });
     }
 
@@ -99,10 +90,10 @@ public class SpongeModGameRegistry extends SpongeGameRegistry {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends CatalogType> com.google.common.base.Optional<T> getType(Class<T> typeClass, String id) {
+    public <T extends CatalogType> java.util.Optional<T> getType(Class<T> typeClass, String id) {
         Map<String, ? extends CatalogType> tempMap = this.catalogTypeMap.get(checkNotNull(typeClass, "null type class"));
         if (tempMap == null) {
-            return com.google.common.base.Optional.absent();
+            return java.util.Optional.empty();
         } else {
             if (BlockType.class.isAssignableFrom(typeClass) || ItemType.class.isAssignableFrom(typeClass)
                     || EntityType.class.isAssignableFrom(typeClass)) {
@@ -113,9 +104,9 @@ public class SpongeModGameRegistry extends SpongeGameRegistry {
 
             T type = (T) tempMap.get(id.toLowerCase());
             if (type == null) {
-                return com.google.common.base.Optional.absent();
+                return java.util.Optional.empty();
             } else {
-                return com.google.common.base.Optional.of(type);
+                return java.util.Optional.of(type);
             }
         }
     }

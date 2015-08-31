@@ -25,7 +25,7 @@
 package org.spongepowered.mod.mixin.core.forge;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;

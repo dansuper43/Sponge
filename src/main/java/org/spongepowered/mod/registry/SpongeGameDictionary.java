@@ -24,8 +24,6 @@
  */
 package org.spongepowered.mod.registry;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import net.minecraft.item.Item;
 import net.minecraftforge.oredict.OreDictionary;
 import org.spongepowered.api.GameDictionary;
@@ -50,7 +48,7 @@ public class SpongeGameDictionary implements GameDictionary {
 
     @Override
     public Set<ItemType> get(String key) {
-        HashSet<ItemType> items = Sets.newHashSet();
+        HashSet<ItemType> items = new HashSet<>();
         for (net.minecraft.item.ItemStack itemStack : OreDictionary.getOres(key)) {
             items.add((ItemType) itemStack.getItem());
         }
@@ -59,7 +57,7 @@ public class SpongeGameDictionary implements GameDictionary {
 
     @Override
     public Map<String, Set<ItemType>> getAllItems() {
-        HashMap<String, Set<ItemType>> allItems = Maps.newHashMap();
+        HashMap<String, Set<ItemType>> allItems = new HashMap<>();
         for (String key : OreDictionary.getOreNames()) {
             allItems.put(key, this.get(key));
         }

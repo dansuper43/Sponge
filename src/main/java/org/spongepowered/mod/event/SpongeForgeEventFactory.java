@@ -24,7 +24,7 @@
  */
 package org.spongepowered.mod.event;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;

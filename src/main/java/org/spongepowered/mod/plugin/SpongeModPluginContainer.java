@@ -26,10 +26,7 @@ package org.spongepowered.mod.plugin;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Injector;
@@ -61,6 +58,9 @@ import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.security.cert.Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -182,9 +182,9 @@ public class SpongeModPluginContainer implements ModContainer, SpongePluginConta
 
         String annotationDependencies = (String) this.pluginDescriptor.get("dependencies");
 
-        Set<ArtifactVersion> requirements = Sets.newHashSet();
-        List<ArtifactVersion> dependencies = Lists.newArrayList();
-        List<ArtifactVersion> dependants = Lists.newArrayList();
+        Set<ArtifactVersion> requirements = new HashSet<>();
+        List<ArtifactVersion> dependencies = new ArrayList<>();
+        List<ArtifactVersion> dependants = new ArrayList<>();
 
         Loader.instance().computeDependencies(annotationDependencies, requirements, dependencies, dependants);
 
@@ -278,7 +278,7 @@ public class SpongeModPluginContainer implements ModContainer, SpongePluginConta
 
     @Override
     public Map<String, String> getSharedModDescriptor() {
-        Map<String, String> descriptor = Maps.newHashMap();
+        Map<String, String> descriptor = new HashMap<>();
 
         descriptor.put("modsystem", "Sponge");
         descriptor.put("id", getModId());

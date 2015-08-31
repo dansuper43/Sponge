@@ -25,7 +25,7 @@
 package org.spongepowered.mod.mixin.core.event.player;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +39,7 @@ public abstract class MixinEventPlayerInteractEntity extends MixinEventPlayer im
 
     @Override
     public Optional<Vector3d> getInteractionPoint() {
-        return Optional.absent();
+        return Optional.empty();
     }
 
 }

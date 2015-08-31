@@ -24,7 +24,6 @@
  */
 package org.spongepowered.mod.mixin.core.event.world;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.BlockPos;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -50,6 +49,7 @@ import org.spongepowered.mod.mixin.core.fml.common.eventhandler.MixinEvent;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 @Mixin(value = net.minecraftforge.event.world.ExplosionEvent.class, remap = false)
 public abstract class MixinEventWorldExplosion extends MixinEvent implements ExplosionEvent {
@@ -111,7 +111,7 @@ public abstract class MixinEventWorldExplosion extends MixinEvent implements Exp
             while (iterator.hasNext()) {
                 BlockTransaction transaction = iterator.next();
                 Location<World> location = transaction.getOriginal().getLocation().get();
-                if (!predicate.apply(location)) {
+                if (!predicate.test(location)) {
                     transaction.setIsValid(false);
                 }
             }
@@ -136,7 +136,7 @@ public abstract class MixinEventWorldExplosion extends MixinEvent implements Exp
                 while (iterator.hasNext()) {
                     Entity entity = iterator.next();
                     Location<World> location = entity.getLocation();
-                    if (!predicate.apply(location)) {
+                    if (!predicate.test(location)) {
                         iterator.remove();
                     }
                 }
@@ -149,8 +149,8 @@ public abstract class MixinEventWorldExplosion extends MixinEvent implements Exp
             if (((net.minecraftforge.event.world.ExplosionEvent.Detonate) (Object) this).isCancelable()) {
                 Iterator<? extends Entity> iterator = this.getEntities().iterator();
                 while (iterator.hasNext()) {
-                    Entity entity = (Entity) iterator.next();
-                    if (!predicate.apply(entity)) {
+                    Entity entity = iterator.next();
+                    if (!predicate.test(entity)) {
                         iterator.remove();
                     }
                 }
