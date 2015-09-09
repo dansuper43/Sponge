@@ -1,6 +1,6 @@
 Sponge [![Build Status](https://travis-ci.org/SpongePowered/Sponge.svg?branch=master)](https://travis-ci.org/SpongePowered/Sponge)
 =============
-
+#Thank You For Choosing Sponge
 **Currently not stable and under heavy development!**
 
 A Forge implementation of the Sponge API.
@@ -119,3 +119,5 @@ __Help! Things are not working!__
 [Community Chat]: https://webchat.esper.net/?channels=sponge
 [Development Chat]: https://webchat.esper.net/?channels=spongedev
 [Jenkins]: https://jenkins-ci.org/
+
+#Thank You For Choosing Sponge
