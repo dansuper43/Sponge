@@ -2,6 +2,7 @@ Sponge [![Build Status](https://travis-ci.org/SpongePowered/Sponge.svg?branch=ma
 =============
 
 **Currently not stable and under heavy development!**
+**Don't Be Scared To Run It Everything Will Go Smoothly**
 
 A Forge implementation of the Sponge API.
 
